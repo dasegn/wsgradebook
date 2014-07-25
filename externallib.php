@@ -37,11 +37,24 @@ class local_wsgradebook_external extends external_api {
     }
 
     /**
-     * Returns welcome message
-     * @return string welcome message
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function get_certificates_parameters() {
+        return new external_function_parameters(
+                array(
+                    'userid' => new external_value(PARAM_INT, 'The user ID. By default in "nothing"') 
+        );
+    }
+
+    /**
+     * Returns user gradebook
+     * @return array
      */
     public static function get_gradebook($userid, $course) {
         global $CFG, $DB, $USER;
+
+        $gradebook = array();
 
         //Parameter validation
         //REQUIRED
@@ -59,7 +72,7 @@ class local_wsgradebook_external extends external_api {
             throw new moodle_exception('cannotviewprofile');
         }
 
-        return $params['welcomemessage'] . $USER->firstname ;;
+        return $gradebook;
     }
 
     /**
@@ -67,9 +80,65 @@ class local_wsgradebook_external extends external_api {
      * @return external_description
      */
     public static function get_gradebook_returns() {
-        return new external_value(PARAM_TEXT, 'The welcome message + user first name');
+        return external_multiple_structure(
+            new external_single_structure(
+                array (
+                    'id' => new external_value(PARAM_INT, 'certificate id'),
+                    'id_curso' => new external_value(PARAM_INT, 'id of course'),
+                    'id_alumno' => new external_value(PARAM_INT, 'id of student'),
+                    'item' => new external_value(PARAM_RAW, 'concept of grade'),
+                    'raw' => new external_value(PARAM_RAW, 'raw calification of item'),
+                    'final' => new external_value(PARAM_RAW, 'final calification of item'),
+                    'datecreated' => new external_value(PARAM_INT, 'the item date of creation'),
+                    'datemodified' => new external_value(PARAM_INT, 'the item date of modification'),
+                )
+            )
+        );
     }
 
+    /**
+     * Returns user certificates
+     * @return array
+     */
+    public static function get_certificates($userid) {
+        global $CFG, $DB, $USER;
+        $certificates;
 
+        //Parameter validation
+        //REQUIRED
+        $params = self::validate_parameters(self::get_gradebook_parameters(),
+                array('userid' => $userid, 'course' => $course));
+
+        //Context validation
+        //OPTIONAL but in most web service it should present
+        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        self::validate_context($context);
+
+        //Capability checking
+        //OPTIONAL but in most web service it should present
+        if (!has_capability('moodle/user:viewdetails', $context)) {
+            throw new moodle_exception('cannotviewprofile');
+        }
+
+        return $certificates;
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_certificates_returns() {
+        return external_multiple_structure(
+            new external_single_structure(
+                array (
+                    'id' => new external_value(PARAM_INT, 'certificate id'),
+                    'id_curso' => new external_value(PARAM_INT, 'id of course'),
+                    'id_alumno' => new external_value(PARAM_INT, 'id of student'),
+                    'code' => new external_value(PARAM_INT, 'code of certificate'),
+                    'timecreated' => new external_value(PARAM_INT, 'time of certificate creation'),
+                )
+            )
+        );
+    }
 
 }

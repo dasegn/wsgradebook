@@ -29,13 +29,20 @@ $functions = array(
                 'classpath'   => 'local/wsgradebook/externallib.php',
                 'description' => 'Get the student gradebook',
                 'type'        => 'read',
-        )
+        ),
+        'local_wsgradebook_get_certificates' => array(
+                'classname'   => 'local_wsgradebook_external',
+                'methodname'  => 'get_certificates',
+                'classpath'   => 'local/wsgradebook/externallib.php',
+                'description' => 'Get the student certificates',
+                'type'        => 'read',
+        ),        
 );
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
 $services = array(
         'wsgradebookservice' => array(
-                'functions' => array ('local_wsgradebook_get_gradebook'),
+                'functions' => array ('local_wsgradebook_get_gradebook', 'local_wsgradebook_get_certificates'),
                 'restrictedusers' => 0,
                 'enabled'=>1,
         )
