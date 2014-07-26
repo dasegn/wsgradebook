@@ -43,7 +43,7 @@ class local_wsgradebook_external extends external_api {
     public static function get_certificates_parameters() {
         return new external_function_parameters(
                 array(
-                    'userid' => new external_value(PARAM_INT, 'The user ID. By default in "nothing"') 
+                    'userid' => new external_value(PARAM_INT, 'The user ID. By default in "nothing"')) 
         );
     }
 
@@ -80,7 +80,7 @@ class local_wsgradebook_external extends external_api {
      * @return external_description
      */
     public static function get_gradebook_returns() {
-        return external_multiple_structure(
+        return new external_multiple_structure(
             new external_single_structure(
                 array (
                     'id' => new external_value(PARAM_INT, 'certificate id'),
@@ -102,9 +102,15 @@ class local_wsgradebook_external extends external_api {
      */
     public static function get_certificates($userid) {
         global $CFG, $DB, $USER;
-        $certificates;
+        $certificates =                 array (
+                    'id' => 0,
+                    'id_curso' => 0,
+                    'id_alumno' => 0,
+                    'code' => 1,
+                    'timecreated' => 1,
+                );
 
-        //Parameter validation
+        /*//Parameter validation
         //REQUIRED
         $params = self::validate_parameters(self::get_gradebook_parameters(),
                 array('userid' => $userid, 'course' => $course));
@@ -119,6 +125,7 @@ class local_wsgradebook_external extends external_api {
         if (!has_capability('moodle/user:viewdetails', $context)) {
             throw new moodle_exception('cannotviewprofile');
         }
+        */
 
         return $certificates;
     }
@@ -128,7 +135,7 @@ class local_wsgradebook_external extends external_api {
      * @return external_description
      */
     public static function get_certificates_returns() {
-        return external_multiple_structure(
+        return new external_multiple_structure(
             new external_single_structure(
                 array (
                     'id' => new external_value(PARAM_INT, 'certificate id'),
