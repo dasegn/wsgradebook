@@ -31,8 +31,9 @@ class local_wsgradebook_external extends external_api {
     public static function get_gradebook_parameters() {
         return new external_function_parameters(
                 array(
-                    'userid' => new external_value(PARAM_INT, 'The user ID. By default in "nothing"'), 
-                    'course' => new external_value(PARAM_INT, 'The course ID. By default in "nothing"'))
+                    'userid' => new external_value(PARAM_INT, 'The user ID'), 
+                    'course' => new external_value(PARAM_INT, 'The course ID')
+                )
         );
     }
 
@@ -43,7 +44,8 @@ class local_wsgradebook_external extends external_api {
     public static function get_certificates_parameters() {
         return new external_function_parameters(
                 array(
-                    'userid' => new external_value(PARAM_INT, 'The user ID. By default in "nothing"')) 
+                    'userid' => new external_value(PARAM_INT, 'The user ID')
+                ) 
         );
     }
 
@@ -82,7 +84,7 @@ class local_wsgradebook_external extends external_api {
     public static function get_gradebook_returns() {
         return new external_multiple_structure(
             new external_single_structure(
-                array (
+                array(
                     'id' => new external_value(PARAM_INT, 'certificate id'),
                     'id_curso' => new external_value(PARAM_INT, 'id of course'),
                     'id_alumno' => new external_value(PARAM_INT, 'id of student'),
@@ -102,13 +104,22 @@ class local_wsgradebook_external extends external_api {
      */
     public static function get_certificates($userid) {
         global $CFG, $DB, $USER;
-        $certificates =                 array (
-                    'id' => 0,
-                    'id_curso' => 0,
-                    'id_alumno' => 0,
-                    'code' => 1,
-                    'timecreated' => 1,
-                );
+        $certificates = array();
+        $certificate = array();
+        $certificate['id'] = 1;
+        $certificate['id_curso'] = 2; 
+        $certificate['id_alumno'] = 3;
+        $certificate['code'] = 4;
+        $certificate['timecreated'] = 5; 
+        $certificates[] = $certificate;
+
+        /*
+                    'id' => $userid,
+                    'id_curso' => 2,
+                    'id_alumno' => 3,
+                    'code' => 4,
+                    'timecreated' => 5
+                );*/
 
         /*//Parameter validation
         //REQUIRED
@@ -137,7 +148,7 @@ class local_wsgradebook_external extends external_api {
     public static function get_certificates_returns() {
         return new external_multiple_structure(
             new external_single_structure(
-                array (
+                array(
                     'id' => new external_value(PARAM_INT, 'certificate id'),
                     'id_curso' => new external_value(PARAM_INT, 'id of course'),
                     'id_alumno' => new external_value(PARAM_INT, 'id of student'),
