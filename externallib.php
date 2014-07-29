@@ -31,8 +31,7 @@ class local_wsgradebook_external extends external_api {
     public static function get_gradebook_parameters() {
         return new external_function_parameters(
                 array(
-                    'userid' => new external_value(PARAM_INT, 'The user ID'), 
-                    'course' => new external_value(PARAM_INT, 'The course ID')
+
                 )
         );
     }
@@ -44,7 +43,7 @@ class local_wsgradebook_external extends external_api {
     public static function get_certificates_parameters() {
         return new external_function_parameters(
                 array(
-                    'userid' => new external_value(PARAM_INT, 'The user ID')
+
                 ) 
         );
     }
@@ -53,28 +52,40 @@ class local_wsgradebook_external extends external_api {
      * Returns user gradebook
      * @return array
      */
-    public static function get_gradebook($userid, $course) {
+    public static function get_gradebook() {
         global $CFG, $DB, $USER;
+        $gradebooks = array();
+        $gb_sql = "SELECT cu.idnumber AS course_id,
+                    cu.id AS course_idnum,
+                    usr.id as student_id,
+                    gi.itemname AS gradebookitem,
+                    gg.rawgrade AS raw_grade,
+                    gg.finalgrade AS final_grade,
+                    gg.timecreated AS date_created,
+                    gg.timemodified AS date_modified
+                    FROM {grade_grades} AS gg
+                    LEFT JOIN {user} AS usr ON gg.userid = usr.id
+                    LEFT JOIN {grade_items} AS gi ON gg.itemid = gi.id
+                    LEFT JOIN {course} AS cu ON gi.courseid = cu.id";
+        $gbrecords = $DB->get_records_sql($gb_sql)
+        if ($gbrecords) {
+            foreach ($gbrecords as $gb) {
+                $gradebooks[] = array(
+                    'id' => $gb->course_id,
+                    'id_curso' => $gb->course_idnum,
+                    'id_alumno' => $gb->student_id,
+                    'item' => $gb->gradebookitem,
+                    'raw' => $gb->raw_grade,
+                    'final' => $gb->final_grade,
+                    'datecreated' => $gb->date_created,
+                    'datemodified' => $gb->date_modified
+                );
+            }
 
-        $gradebook = array();
-
-        //Parameter validation
-        //REQUIRED
-        $params = self::validate_parameters(self::get_gradebook_parameters(),
-                array('userid' => $userid, 'course' => $course));
-
-        //Context validation
-        //OPTIONAL but in most web service it should present
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
-        self::validate_context($context);
-
-        //Capability checking
-        //OPTIONAL but in most web service it should present
-        if (!has_capability('moodle/user:viewdetails', $context)) {
-            throw new moodle_exception('cannotviewprofile');
         }
+        
 
-        return $gradebook;
+        return $gradebooks;
     }
 
     /**
@@ -85,7 +96,7 @@ class local_wsgradebook_external extends external_api {
         return new external_multiple_structure(
             new external_single_structure(
                 array(
-                    'id' => new external_value(PARAM_INT, 'certificate id'),
+                    'id' => new external_value(PARAM_RAW, 'course id number'),
                     'id_curso' => new external_value(PARAM_INT, 'id of course'),
                     'id_alumno' => new external_value(PARAM_INT, 'id of student'),
                     'item' => new external_value(PARAM_RAW, 'concept of grade'),
@@ -102,24 +113,26 @@ class local_wsgradebook_external extends external_api {
      * Returns user certificates
      * @return array
      */
-    public static function get_certificates($userid) {
+    public static function get_certificates() {
         global $CFG, $DB, $USER;
         $certificates = array();
         $certificate = array();
-        $certificate['id'] = 1;
-        $certificate['id_curso'] = 2; 
-        $certificate['id_alumno'] = 3;
-        $certificate['code'] = 4;
-        $certificate['timecreated'] = 5; 
-        $certificates[] = $certificate;
 
-        /*
-                    'id' => $userid,
-                    'id_curso' => 2,
-                    'id_alumno' => 3,
-                    'code' => 4,
-                    'timecreated' => 5
-                );*/
+        $cer_sql = "SELECT ce.id, ci.userid, ce.course, ce.name, ci.code, ci.timecreated 
+                    FROM {certificate_issues} as ci
+                    JOIN {certificate} as ce on ce.id = ci.certificateid";
+
+        if ($cerecords = $DB->get_records_sql($cer_sql)) {
+            foreach ($cerecords as $cert) {
+                $certificate['id'] = $cert->id;
+                $certificate['id_curso'] = $cert->course; 
+                $certificate['id_alumno'] = $cert->userid;
+                $certificate['code'] = $cert->code;
+                $certificate['timecreated'] = $cert->timecreated; 
+                $certificates[] = $certificate;
+            }
+
+        }
 
         /*//Parameter validation
         //REQUIRED
