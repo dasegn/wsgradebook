@@ -55,7 +55,8 @@ class local_wsgradebook_external extends external_api {
     public static function get_gradebook() {
         global $CFG, $DB, $USER;
         $gradebooks = array();
-        $gb_sql = "SELECT cu.idnumber AS course_id,
+        $gb_sql = "SELECT gg.id AS gid, 
+                    cu.idnumber AS course_id,
                     cu.id AS course_idnum,
                     usr.id as student_id,
                     gi.itemname AS gradebookitem,
@@ -67,7 +68,7 @@ class local_wsgradebook_external extends external_api {
                     LEFT JOIN {user} AS usr ON gg.userid = usr.id
                     LEFT JOIN {grade_items} AS gi ON gg.itemid = gi.id
                     LEFT JOIN {course} AS cu ON gi.courseid = cu.id";
-        $gbrecords = $DB->get_records_sql($gb_sql)
+        $gbrecords = $DB->get_records_sql($gb_sql);
         if ($gbrecords) {
             foreach ($gbrecords as $gb) {
                 $gradebooks[] = array(
