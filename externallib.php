@@ -81,7 +81,12 @@ class local_wsgradebook_external extends external_api {
 
         $gradebooks = array();
         $gb_sql = "SELECT gg.id AS gid, 
+<<<<<<< HEAD
                     cu.id AS course_id,
+=======
+                    cu.idnumber AS course_id,
+                    cu.id AS course_idnum,
+>>>>>>> FETCH_HEAD
                     usr.id as student_id,
                     gi.itemname AS itemname,
                     gi.itemtype AS itemtype,
@@ -92,12 +97,19 @@ class local_wsgradebook_external extends external_api {
                     gg.timecreated AS date_created,
                     gg.timemodified AS date_modified
                     FROM {grade_grades} AS gg
+<<<<<<< HEAD
                     JOIN {user} AS usr ON gg.userid = usr.id
                     JOIN {grade_items} AS gi ON gg.itemid = gi.id
                     JOIN {course} AS cu ON gi.courseid = cu.id 
                     ORDER BY course_id, student_id";
         $gbrecords = $DB->get_records_sql($gb_sql, $params=null, $limitfrom=0, $limitnum=0);
 
+=======
+                    LEFT JOIN {user} AS usr ON gg.userid = usr.id
+                    LEFT JOIN {grade_items} AS gi ON gg.itemid = gi.id
+                    LEFT JOIN {course} AS cu ON gi.courseid = cu.id";
+        $gbrecords = $DB->get_records_sql($gb_sql);
+>>>>>>> FETCH_HEAD
         if ($gbrecords) {
             foreach ($gbrecords as $gb) {
                 array_push($gradebooks, array(
