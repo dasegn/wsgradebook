@@ -82,8 +82,6 @@ class local_wsgradebook_external extends external_api {
         $gradebooks = array();
         $gb_sql = "SELECT gg.id AS gid, 
                     cu.id AS course_id,
-                    cu.idnumber AS course_id,
-                    cu.id AS course_idnum,
                     usr.id as student_id,
                     gi.itemname AS itemname,
                     gi.itemtype AS itemtype,
